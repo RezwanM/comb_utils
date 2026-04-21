@@ -69,7 +69,7 @@ class BaseCaller(ABC):
     #: The requests call method. (get, post, etc.)
     _request_call: _Callable[..., requests.Response]
     #: The URL for the API call.
-    #_url: str
+    _url: str
 
     # Must set in child class:
     #: The timeout for the API call.
@@ -264,15 +264,6 @@ class GetCaller(BaseCaller):
     _min_wait_seconds: float = RateLimits.READ_SECONDS
     _wait_seconds: float = _min_wait_seconds
 
-    @typechecked
-    def __init__(self, url: str) -> None:  # noqa: ANN401
-        """Initialize the GetCaller object.
-
-        Args:
-            url: The URL for the page. (Optionally contains nextPageToken.)
-        """
-        super().__init__(url=url)
-
 
 class PostCaller(BaseCaller):
     """A base class for making POST API calls.
@@ -285,15 +276,6 @@ class PostCaller(BaseCaller):
     _min_wait_seconds: float = RateLimits.WRITE_SECONDS
     _wait_seconds: float = _min_wait_seconds
 
-    @typechecked
-    def __init__(self, url: str) -> None:  # noqa: ANN401
-        """Initialize the PostCaller object.
-
-        Args:
-            url: The URL for the page. (Optionally contains nextPageToken.)
-        """
-        super().__init__(url=url)
-
 
 class DeleteCaller(PostCaller):
     """A base class for making DELETE API calls.
@@ -302,15 +284,6 @@ class DeleteCaller(PostCaller):
     """
 
     _request_call: _Callable[..., requests.Response] = requests.delete
-
-    @typechecked
-    def __init__(self, url: str) -> None:  # noqa: ANN401
-        """Initialize the DeleteCaller object.
-
-        Args:
-            url: The URL for the page. (Optionally contains nextPageToken.)
-        """
-        super().__init__(url=url)
 
 
 class PagedResponseGetter(GetCaller):
@@ -337,7 +310,7 @@ class PagedResponseGetter(GetCaller):
         self._params = params
         self._check_duplicates_in_URL()
         self._add_params_to_URL()
-        super().__init__(url=self._page_url)
+        super().__init__(self._page_url)
 
     @typechecked
     def _check_duplicates_in_URL(self) -> None:
