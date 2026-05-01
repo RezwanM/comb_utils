@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseCaller(ABC):
-    """An abstract class for making API calls..
+    """An abstract class for making API calls.
 
     See :doc:`api_callers`.
 
