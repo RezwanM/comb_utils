@@ -26,6 +26,18 @@ RequestType = Literal["get", "post", "delete"]
 REQUEST_TYPES: Final = get_args(RequestType)
 
 
+@pytest.fixture(autouse=True)
+@typechecked
+def reset_rate_limits() -> None:
+    """Reset the class-level rate limit attributes to their defaults."""
+    GetCaller._wait_seconds = RateLimits.READ_SECONDS
+    GetCaller._timeout = RateLimits.READ_TIMEOUT_SECONDS
+    PostCaller._wait_seconds = RateLimits.WRITE_SECONDS
+    PostCaller._timeout = RateLimits.WRITE_TIMEOUT_SECONDS
+    DeleteCaller._wait_seconds = RateLimits.WRITE_SECONDS
+    DeleteCaller._timeout = RateLimits.WRITE_TIMEOUT_SECONDS
+
+
 @typechecked
 def _caller_factory(request_type: RequestType) -> BaseCaller:
     mock_caller: BaseCaller

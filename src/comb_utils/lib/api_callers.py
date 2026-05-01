@@ -1,7 +1,7 @@
 """Classes for making API calls."""
 
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable as _Callable
 from time import sleep
 from typing import Any
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseCaller(ABC):
-    """An abstract class for making API calls.
+    """An abstract class for making API calls..
 
     See :doc:`api_callers`.
 
@@ -66,8 +66,11 @@ class BaseCaller(ABC):
     _response: requests.Response
 
     # Must set in child class:
-    #: The requests call method. (get, post, etc.)
-    _request_call: _Callable[..., requests.Response]
+    @property
+    @abstractmethod
+    def _request_call(self) -> _Callable[..., requests.Response]:
+        """The requests call method (get, post, etc.)."""
+
     #: The URL for the API call.
     _url: str
 
@@ -259,7 +262,11 @@ class GetCaller(BaseCaller):
     Presets the timeout, initial wait time, and requests method.
     """
 
-    _request_call: _Callable[..., requests.Response] = requests.get
+    @property
+    def _request_call(self) -> _Callable[..., requests.Response]:
+        """The requests call method."""
+        return requests.get
+
     _timeout: float = RateLimits.READ_TIMEOUT_SECONDS
     _min_wait_seconds: float = RateLimits.READ_SECONDS
     _wait_seconds: float = _min_wait_seconds
@@ -271,7 +278,11 @@ class PostCaller(BaseCaller):
     Presets the timeout, initial wait time, and requests method.
     """
 
-    _request_call: _Callable[..., requests.Response] = requests.post
+    @property
+    def _request_call(self) -> _Callable[..., requests.Response]:
+        """The requests call method."""
+        return requests.post
+
     _timeout: float = RateLimits.WRITE_TIMEOUT_SECONDS
     _min_wait_seconds: float = RateLimits.WRITE_SECONDS
     _wait_seconds: float = _min_wait_seconds
@@ -283,7 +294,10 @@ class DeleteCaller(PostCaller):
     Presets the timeout, initial wait time, and requests method.
     """
 
-    _request_call: _Callable[..., requests.Response] = requests.delete
+    @property
+    def _request_call(self) -> _Callable[..., requests.Response]:
+        """The requests call method."""
+        return requests.delete
 
 
 class PagedResponseGetter(GetCaller):
